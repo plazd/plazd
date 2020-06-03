@@ -32,6 +32,10 @@ const UserSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
+  },
+  complete: {
+    type: Boolean,
+    default: false
   }
 });
 

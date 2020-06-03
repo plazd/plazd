@@ -6,23 +6,24 @@ const Resume = require('../../models/Resume');
 const User = require('../../models/User');
 const Listing = require('../../models/Listing');
 
-// @route  GET api/radar
-// @desc   Radar route
+// @route  GET api/status
+// @desc   Get status route
 // @access Private
-router.get('/', auth, (req,res) => {
-    const radar = [ ];
+router.get('/', auth, async (req,res) => {
+    const status = [];
+    const user = await User.findById(req.user.id).select('-password');
     Listing.find({}, (err,listing) => {
         if(err) throw err;
         listing.forEach(list => {
-            if(list.applied.length !== 0) {
-                if(list.applied.filter(applied => applied.user.toString() === req.user.id)) {
-                    for (i = 0; i < list.applied.length; i++) {
-                        console.log(list.applied[i]);
+            if(list.status.length !== 0) {
+                if(list.college === user.college)
+                    for (i = 0; i < list.status.length; i++) {
+                        console.log(list.status[i]);
                     }
-                }
             }
         })
     });
+    // console.log(status);
 });
 
 module.exports = router;

@@ -13,6 +13,7 @@ app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/resume', require('./routes/api/resume'));
 app.use('/api/listing', require('./routes/api/listing'));
 app.use('/api/radar/', require('./routes/api/radar'));
+app.use('/api/status/', require('./routes/api/status'));
 app.use('/api/form', require('./routes/api/form'));
 
 app.get('/', (req,res) => res.send('API Running'));

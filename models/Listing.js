@@ -4,7 +4,7 @@ const ListingSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-      },
+    },
     text: {
       type: String,
       required: true
@@ -25,6 +25,13 @@ const ListingSchema = new mongoose.Schema({
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'user'
+        },
+        avatar: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String
         },
         text: {
             type: String,
@@ -51,6 +58,10 @@ const ListingSchema = new mongoose.Schema({
         date: {
             type: Date,
             default: Date.now
+        },
+        inprocess: {
+            type: Boolean,
+            default: true
         }
     }],
     lastDateApply:  {

@@ -30,6 +30,7 @@ router.get('/me', auth, async (req,res) => {
 router.post('/profile', [auth, [
     check('rollno', 'rollno is required').not().isEmpty(),
     check('batch', 'batch is required').not().isEmpty(),
+    check('program', 'program is required').not().isEmpty(),
     check('branch', 'branch is required').not().isEmpty(),
     check('phone', 'phone is required').not().isEmpty(),
     check('skills', 'Skills is required').not().isEmpty()
@@ -41,6 +42,7 @@ router.post('/profile', [auth, [
     const {
         rollno,
         batch,
+        program,
         branch,
         dob,
         phone,
@@ -50,13 +52,19 @@ router.post('/profile', [auth, [
         courses,
         bio,
         linkedin, 
-        github
+        github,
+        youtube,
+        twitter,
+        codeforce,
+        codechef,
+        other
       } = req.body;
 
       const resumeFields = {
         rollno,
         user: req.user.id,
         batch,
+        program,
         branch,
         // website: website && website !== '' ? normalize(website, { forceHttps: true }) : '',
         dob,
@@ -73,6 +81,11 @@ router.post('/profile', [auth, [
       resumeFields.social = {};
       if(linkedin) resumeFields.social.linkedin =linkedin;
       if(github) resumeFields.social.github = github;
+      if(youtube) resumeFields.social.youtube = youtube;
+      if(twitter) resumeFields.social.twitter = twitter;
+      if(codeforce) resumeFields.social.codeforce = codeforce;
+      if(codechef) resumeFields.social.codechef = codechef;
+      if(other) resumeFields.social.other = other;
       
       try {
         // Using upsert option (creates new doc if no match is found):
@@ -81,14 +94,17 @@ router.post('/profile', [auth, [
           { $set: resumeFields },
           { new: true, upsert: true }
         );
+
+        await User.findByIdAndUpdate(req.user.id, {complete: true});
+
         res.json(resume);
       } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
       }
 
-      console.log(resumeFields.skills);
-      res.send('Hello');
+      // console.log(resumeFields.skills);
+      // res.send('Hello');
 
 });
 
@@ -97,7 +113,7 @@ router.post('/profile', [auth, [
 // @access   Public
 router.get('/', async (req, res) => {
     try {
-      const resume = await Resume.find().populate('user', ['name', 'avatar', 'college']);
+      const resume = await Resume.find().populate('user', ['name', 'avatar', 'college']).select('-phone').select('-dob').select('-altmail').select('-location');
       res.json(resume);
     } catch (err) {
       console.error(err.message);
@@ -382,7 +398,7 @@ router.put('/ach', [auth,[
   }
 });
 
-// @route    DELETE api/resume/proj/:proj_id
+// @route    DELETE api/resume/ach/:ach_id
 // @desc     Delete Achievemnt by id
 // @access   Private
 router.delete('/ach/:ach_id', auth, async (req, res) => {

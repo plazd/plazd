@@ -6,6 +6,9 @@ const Resume = require('../../models/Resume');
 const User = require('../../models/User');
 const Listing = require('../../models/Listing');
 
+// Required Put for listing lastDateApply
+
+
 // @route  POST api/listing
 // @desc   Create a listing
 // @access Private
@@ -18,7 +21,9 @@ router.post('/', [auth, [
         return res.status(400).json({ errors: errors.array() });
     }
     const user = await User.findById(req.user.id).select('-password');
-
+    if(user.role === false) {
+        return res.status(401).json({ msg: 'User not Authorized' });
+    }
     try {
         const newListing =new Listing ({
             text: req.body.text,
@@ -31,7 +36,7 @@ router.post('/', [auth, [
 
         newListing.status = {
             user: req.user.id,
-            text: "Happy to annouce"            
+            text: "Follow this Company Status for latest update"            
         };        
         const listing = await newListing.save();
 
@@ -48,6 +53,8 @@ router.post('/', [auth, [
 // @access Private
 router.get('/', auth, async(req,res) => {
     try {
+
+        // Get listing according to batch and Branch
         // Add college condition to find()
         const listings = await Listing.find().sort({ date: -1});
         res.json(listings);
@@ -66,6 +73,7 @@ router.get('/', auth, async(req,res) => {
 // @access Private
 router.get('/:id', auth, async(req,res) => {
     try {
+        // Get listing according to batch
         // Add college condition to find()
         const listing = await Listing.findById(req.params.id);
         if(!listing) {
@@ -82,10 +90,11 @@ router.get('/:id', auth, async(req,res) => {
 });
 
 // @route  DELETE api/listing/:id
-// @desc   Get listing by id
+// @desc   Delete listing by id
 // @access Private
 router.delete('/:id', auth, async (req,res) => {
     try {
+
         const listing = await Listing.findById(req.params.id);
         // Check User
         if(!listing) {
@@ -115,7 +124,18 @@ router.delete('/:id', auth, async (req,res) => {
         if(listing.applied.filter(applied => applied.user.toString() === req.user.id).length > 0) {
             return res.status(400).json({msg: 'Listing already applied'});
         }
+        var d = new Date();
+        if(d > listing.lastDateApply) {
+            return res.status(400).json({msg: 'Time for Appling Passed'});
+        }
+
         const userApp = await User.findById(req.user.id);
+        if(userApp.complete === false) {
+            return res.status(400).json({msg: 'Complete Your Resume'});
+        }
+        if(userApp.college !== listing.college) {
+            return res.status(400).json({msg: 'NOt your college resume'});
+        }
         listing.applied.unshift({ user : req.user.id, name: userApp.name, avatar: userApp.avatar});
         await listing.save();
         res.json(listing.applied);
@@ -134,6 +154,10 @@ router.delete('/:id', auth, async (req,res) => {
   
         if(listing.applied.filter(applied => applied.user.toString() === req.user.id).length === 0) {
             return res.status(400).json({msg: 'Listing not applied'});
+        }
+        var d = new Date();
+        if(d > listing.lastDateApply) {
+            return res.status(400).json({msg: 'Time for Unappling Passed'});
         }
         const userApp = await User.findById(req.user.id);
         
@@ -159,14 +183,19 @@ router.post('/status/:id', [auth, [
         return res.status(400).json({ errors: errors.array() });
     }
     const user = await User.findById(req.user.id).select('-password');
-    if(user.role === false)
-    {
+    if(user.role === false) {
         return res.status(400).json({ msg: 'You are not admin' });
     }
+    console.log(user);
     const listing = await Listing.findById(req.params.id);
+    if(user.college !== listing.college) {
+        return res.status(400).json({ msg: 'Listing is for other college' });
+    }
     try {
         const newStatus = {
             user: req.user.id,
+            name: user.name,
+            avatar: user.avatar,
             text: req.body.text            
         };
 

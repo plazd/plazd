@@ -13,11 +13,15 @@ const ResumeSchema = new mongoose.Schema({
     batch: {
         type: Number,
         required: true
-      },
+    },
+    program: {
+      type: String,
+      required: true
+    },
     branch: {
         type: String,
         required: true
-      },
+    },
     dob: {
         type: Date
     },
@@ -167,6 +171,21 @@ const ResumeSchema = new mongoose.Schema({
         },
         github: {
             type: String
+        },
+        youtube: {
+          type: String
+        },
+        twitter: {
+            type: String
+        },
+        codeforce: {
+          type: String
+        },
+        codechef: {
+          type: String
+        },
+        other: {
+          type: String
         }
       },
       date: {
