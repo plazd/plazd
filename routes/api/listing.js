@@ -36,7 +36,8 @@ router.post('/', [auth, [
 
         newListing.status = {
             user: req.user.id,
-            text: "Follow this Company Status for latest update"            
+            avatar: user.avatar,            
+            text: "New Post Added : " + req.body.text            
         };        
         const listing = await newListing.save();
 
@@ -129,6 +130,11 @@ router.delete('/:id', auth, async (req,res) => {
             return res.status(400).json({msg: 'Time for Appling Passed'});
         }
 
+        const resume = await Resume.findOne({user: req.user.id});
+        if(resume.open === false) {
+            return res.status(400).json({msg: 'You are not open for applying'});
+        }
+
         const userApp = await User.findById(req.user.id);
         if(userApp.complete === false) {
             return res.status(400).json({msg: 'Complete Your Resume'});
@@ -136,6 +142,7 @@ router.delete('/:id', auth, async (req,res) => {
         if(userApp.college !== listing.college) {
             return res.status(400).json({msg: 'NOt your college resume'});
         }
+
         listing.applied.unshift({ user : req.user.id, name: userApp.name, avatar: userApp.avatar});
         await listing.save();
         res.json(listing.applied);
@@ -162,7 +169,6 @@ router.delete('/:id', auth, async (req,res) => {
         const userApp = await User.findById(req.user.id);
         
         const removeIndex = listing.applied.map(applied => applied.user.toString()).indexOf(req.user.id);
-
         listing.applied.splice(removeIndex, 1);
         await listing.save();
         res.json(listing.applied);

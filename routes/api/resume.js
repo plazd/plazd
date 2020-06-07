@@ -33,7 +33,7 @@ router.post('/profile', [auth, [
     check('program', 'program is required').not().isEmpty(),
     check('branch', 'branch is required').not().isEmpty(),
     check('phone', 'phone is required').not().isEmpty(),
-    check('skills', 'Skills is required').not().isEmpty()
+    check('dob', 'DOB is required').not().isEmpty()
 ]], async (req,res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()) {   
@@ -49,8 +49,10 @@ router.post('/profile', [auth, [
         location,
         altemail,
         skills,
+        toolsused,
         courses,
         bio,
+        open,
         linkedin, 
         github,
         youtube,
@@ -74,8 +76,12 @@ router.post('/profile', [auth, [
         skills: Array.isArray(skills)
           ? skills
           : skills.split(',').map((skill) => ' ' + skill.trim()),
+        toolsused: Array.isArray(toolsused)
+          ? toolsused
+          : toolsused.split(',').map((toolused) => ' ' + toolused.trim()),
         courses,
-        bio
+        bio,
+        open
       };
 
       resumeFields.social = {};
@@ -245,6 +251,7 @@ router.put('/edu', [auth,[
     from,
     to,
     current,
+    grade,
     description
   } = req.body;
 
@@ -255,6 +262,7 @@ router.put('/edu', [auth,[
     from,
     to,
     current,
+    grade,
     description
   };
   

@@ -23,7 +23,8 @@ const ResumeSchema = new mongoose.Schema({
         required: true
     },
     dob: {
-        type: Date
+        type: Date,
+        required: true
     },
     phone: {
         type: Number,
@@ -36,14 +37,20 @@ const ResumeSchema = new mongoose.Schema({
         type: String
     },
     skills: {
-        type: [String],
-        required: true
+        type: [String]
+    },
+    toolsused: {
+      type: [String]
     },
     courses: {
         type: [String]
     },
     bio: {
         type: String
+    },
+    open:{
+      type: Boolean,
+      default: true
     },
       experience: [
         {
@@ -136,6 +143,10 @@ const ResumeSchema = new mongoose.Schema({
           current: {
             type: Boolean,
             default: false
+          },
+          grade: {
+            type: String,
+            required: true
           },
           description: {
             type: String

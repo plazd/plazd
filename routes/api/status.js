@@ -13,15 +13,19 @@ router.get('/', auth, async (req,res) => {
     const status = [];
     const user = await User.findById(req.user.id).select('-password');
     Listing.find({}, (err,listing) => {
+        var s = [];
         if(err) throw err;
         listing.forEach(list => {
             if(list.status.length !== 0) {
                 if(list.college === user.college)
                     for (i = 0; i < list.status.length; i++) {
+                        s.push(list.status[i]);
                         console.log(list.status[i]);
                     }
             }
         })
+        status = s;
+        res.json(status);
     });
     // console.log(status);
 });
